@@ -1,7 +1,24 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 
 const ClassesIndex = () => {
+
+    const [classes, setClasses] = useState([])
+
+    const fetchClasses = async () => {
+        try {
+            const response = await axios.get('http://localhost:8000/api/student-classes')
+            setClasses(response.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchClasses()
+    }, [])
+
   return (
     <div>
 
@@ -47,13 +64,19 @@ const ClassesIndex = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="border-b dark:border-gray-700">
-                           <td class="px-4 py-3">1</td>
-                            <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">Class 1</th>
-                           
-                            <td class="px-4 py-3"></td>
-                           
-                        </tr>
+                        {classes && classes.length > 0 ? classes.map((cls, index) => (
+                            <tr key={index} class="border-b dark:border-gray-700">
+                                <td class="px-4 py-3">{index + 1}</td>
+                                <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{cls.name}</th>
+                                <td class="px-4 py-3"></td>
+                            </tr>
+                        )) : (
+                            <tr class="border-b dark:border-gray-700">
+                                <td colspan="3" class="px-4 py-3 text-center">No classes available</td>
+                            </tr>
+                        )}
+
+                
                        
                     </tbody>
                 </table>

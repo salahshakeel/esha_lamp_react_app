@@ -1,7 +1,38 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-
+import axios from 'axios'
+import { toast } from 'react-toastify'
 const StudentsIndex = () => {
+    const [students, setStudents] = useState([])
+
+    const fetchStudents = async () => {
+        try{
+            const response = await axios.get('http://localhost:8000/api/students')
+            setStudents(response.data)
+            console.log('Fetched students:', response.data) // Debug log
+        }
+        catch(error){
+            console.error('Error fetching students:', error)
+        }
+    }
+
+    useEffect(() => {
+        fetchStudents()
+    }, [])
+
+    const handleDelete = async (student) => {
+        if(window.confirm(`Are you sure you want to delete ${student.name}?`)){
+            try{
+                const response = await axios.delete(`http://localhost:8000/api/students/${student.id}`)
+                toast.success(response.data.message)
+                fetchStudents()
+            }
+            catch(error){
+                console.error('Error deleting student:', error)
+            }
+        }
+    }
+
   return (
     <div>
 
@@ -39,6 +70,11 @@ const StudentsIndex = () => {
                         <tr>
                               <th scope="col" class="px-4 py-3">#</th>
                             <th scope="col" class="px-4 py-3">Student name</th>
+                              <th scope="col" class="px-4 py-3">Father Name</th>
+                              <th scope="col" class="px-4 py-3">Email</th>
+                            <th scope="col" class="px-4 py-3">Address</th>
+                                <th scope="col" class="px-4 py-3">Phone</th>
+                                        <th scope="col" class="px-4 py-3">Class</th>
                       
                             <th scope="col" class="px-4 py-3">
                                 <span class="sr-only">Actions</span>
@@ -46,13 +82,27 @@ const StudentsIndex = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        {students && students.length > 0 ? students.map((student, index) => (
                         <tr class="border-b dark:border-gray-700">
-                           <td class="px-4 py-3">1</td>
-                            <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">Rafay</th>
+                           <td class="px-4 py-3">{index + 1}</td>
+                            <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{student.name}</th>
                            
-                            <td class="px-4 py-3"></td>
-                           
+                            <td class="px-4 py-3">{student.father_name}</td>
+                            <td class="px-4 py-3">{student.email}</td>
+                            <td class="px-4 py-3">{student.address}</td>
+                            <td class="px-4 py-3">{student.phone}</td>
+                            <td class="px-4 py-3">{student.student_class?.name || 'N/A'}</td>
+                            <td class="px-4 py-3">
+                                <button onClick={() => handleDelete(student)} className="text-red-500 hover:text-red-700">
+                                    Delete
+                                </button>
+                            </td>
                         </tr>
+                        )) : (
+                            <tr>
+                                <td colSpan="9" class="px-4 py-3 text-center text-gray-500">No students found.</td>
+                            </tr>
+                        )}
                        
                     </tbody>
                 </table>
