@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const ClassesIndex = () => {
 
@@ -18,6 +19,19 @@ const ClassesIndex = () => {
     useEffect(() => {
         fetchClasses()
     }, [])
+
+    const handleDelete = async (id) => {
+        if (window.confirm('Are you sure you want to delete this class?')) {
+            try {
+                const response = await axios.delete(`http://localhost:8000/api/student-classes/${id}`)
+                toast.success(response.data.message)
+                fetchClasses()
+            } catch (error) {
+                console.log(error)
+                toast.error(error.response.data.message)
+            }
+        }
+    }
 
   return (
     <div>
@@ -68,7 +82,10 @@ const ClassesIndex = () => {
                             <tr key={index} class="border-b dark:border-gray-700">
                                 <td class="px-4 py-3">{index + 1}</td>
                                 <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{cls.name}</th>
-                                <td class="px-4 py-3"></td>
+                                <td class="px-4 py-3">
+                                    <Link to={`/classes/${cls.id}/edit`} class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</Link>
+                                   <button class="font-medium text-red-600 dark:text-red-500 hover:underline ml-4" onClick={() => handleDelete(cls.id)}>Delete</button>
+                                </td>
                             </tr>
                         )) : (
                             <tr class="border-b dark:border-gray-700">

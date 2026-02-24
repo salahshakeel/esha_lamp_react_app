@@ -10,6 +10,7 @@ import StudentCreate from './pages/students/StudentCreate';
 import UsersIndex from './pages/users/UsersIndex';
 import UserCreate from './pages/users/UserCreate';
 import { ToastContainer } from 'react-toastify';
+import ClassEdit from './pages/classes/ClassEdit';
 function App() {
   return (
     <div className="App py-16 bg-gray-50 h-screen">
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<Home/>} />
             <Route path="/classes" element={<ClassesIndex/>} />
               <Route path="/classes/create" element={<ClassCreate/>} />
+                <Route path="/classes/:id/edit" element={<ClassEdit/>} />
               <Route path="/students" element={<StudentsIndex/>} />
               <Route path="/students/create" element={<StudentCreate/>} />
               <Route path="/users" element={<UsersIndex/>} />
