@@ -6,26 +6,43 @@ import { toast } from 'react-toastify'
 const ClassesIndex = () => {
 
     const [classes, setClasses] = useState([])
+    const [search, setSearch] = useState("")
+    const [pagination, setPagination] = useState({})
+    const [currentPage, setCurrentPage] = useState(1)
+   const fetchClasses = async (page = 1, query = "") => {
+    try {
+        const response = await axios.get(
+            `http://localhost:8000/api/student-classes?page=${page}&search=${query}`
+        )
 
-    const fetchClasses = async () => {
-        try {
-            const response = await axios.get('http://localhost:8000/api/student-classes')
-            setClasses(response.data)
-        } catch (error) {
-            console.log(error)
-        }
+        setClasses(response.data.data)
+        setPagination(response.data)
+        setCurrentPage(response.data.current_page)
+
+    } catch (error) {
+        console.log(error)
     }
+}
 
     useEffect(() => {
-        fetchClasses()
-    }, [])
+        fetchClasses(currentPage, search)
+    }, [currentPage])
+
+      // 🔥 Debounce Search (500ms delay)
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+             fetchClasses(1, search) 
+        }, 500)
+
+        return () => clearTimeout(delayDebounce)
+    }, [search])
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this class?')) {
             try {
                 const response = await axios.delete(`http://localhost:8000/api/student-classes/${id}`)
                 toast.success(response.data.message)
-                fetchClasses()
+               fetchClasses(currentPage, search)
             } catch (error) {
                 console.log(error)
                 toast.error(error.response.data.message)
@@ -51,7 +68,10 @@ const ClassesIndex = () => {
                                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                                 </svg>
                             </div>
-                            <input type="text" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Search" required=""/>
+                            <input type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Search" required=""/>
                         </div>
                     </form>
                 </div>
@@ -98,47 +118,49 @@ const ClassesIndex = () => {
                     </tbody>
                 </table>
             </div>
-            <nav class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4" aria-label="Table navigation">
-                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    Showing
-                    <span class="font-semibold text-gray-900 dark:text-white">1-10</span>
-                    of
-                    <span class="font-semibold text-gray-900 dark:text-white">1000</span>
-                </span>
-                <ul class="inline-flex items-stretch -space-x-px">
-                    <li>
-                        <a href="#" class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="sr-only">Previous</span>
-                            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">1</a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">2</a>
-                    </li>
-                    <li>
-                        <a href="#" aria-current="page" class="flex items-center justify-center text-sm z-10 py-2 px-3 leading-tight text-primary-600 bg-primary-50 border border-primary-300 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white">3</a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">...</a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">100</a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="sr-only">Next</span>
-                            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+         <nav className="flex justify-between items-center p-4">
+
+    <span className="text-sm text-gray-600">
+        Showing {pagination.from} to {pagination.to} of {pagination.total}
+    </span>
+
+    <div className="flex gap-2">
+
+        {/* Previous Button */}
+        <button
+            disabled={!pagination.prev_page_url}
+            onClick={() => setCurrentPage(currentPage - 1)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+        >
+            Previous
+        </button>
+
+        {/* Page Numbers */}
+        {Array.from({ length: pagination.last_page || 0 }, (_, i) => (
+            <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`px-3 py-1 border rounded ${
+                    currentPage === i + 1
+                        ? "bg-black text-white"
+                        : ""
+                }`}
+            >
+                {i + 1}
+            </button>
+        ))}
+
+        {/* Next Button */}
+        <button
+            disabled={!pagination.next_page_url}
+            onClick={() => setCurrentPage(currentPage + 1)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+        >
+            Next
+        </button>
+
+    </div>
+</nav>
         </div>
     </div>
     </section>

@@ -1,72 +1,98 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 import { Input } from '../../components/Input'
 import { TextArea } from '../../components/TextArea'
 import { PrimaryButton } from '../../components/PrimaryButton'
 import { InputLabel } from '../../components/InputLabel'
 import { FormHeading } from '../../components/FormHeading'
-import axois from 'axios'
+import axios from 'axios'
 import { toast } from 'react-toastify'
+
 const ClassCreate = () => {
 
-  const [className, setClassName] = useState("")
-  const [classDescription, setClassDescription] = useState("")
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      description: ''
+    },
+    validationSchema: Yup.object({
+      name: Yup.string()
+        .min(3, 'Class name must be at least 3 characters')
+        .required('Class name is required'),
+      description: Yup.string()
+        .min(10, 'Description must be at least 10 characters')
+        .required('Class description is required')
+    }),
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        const response = await axios.post(
+          'http://localhost:8000/api/student-classes',
+          values
+        )
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    try{
-      const response = await axois.post('http://localhost:8000/api/student-classes', {
-        name: className,
-        description: classDescription
-      })
-      toast.success(response.data.message)
-      console.log(response.data)
-      setClassName("")
-      setClassDescription("")
-      window.location.href = "/classes"
-    }catch(error){
-      console.log(error)
-      toast.error(error.response.data.message)
+        toast.success(response.data.message)
+        resetForm()
+        window.location.href = "/classes"
+
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Something went wrong")
+      }
     }
-  }
+  })
 
   return (
     <div>
+      <section>
+        <div className="py-8 px-4 mx-auto max-w-2xl lg:py-16">
+          <FormHeading text={"Add a new class"} />
 
-        <section class="">
-          <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16">
-            <FormHeading text={"Add a new class"}/>
-              <form onSubmit={handleSubmit}>
-                  <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                      <div class="sm:col-span-2">
-                         <InputLabel htmlFor={"class_name"} text={"Class name"}/>
-                          <Input 
-                            name="class_name"
-                            id="class_name"
-                            placeholder={"Please enter class name"}
-                            required={true}
-                            value={className}
-                            onChange={(e) => setClassName(e.target.value)}
-                          />
-                      </div>
-                     
-                      <div class="sm:col-span-2">
-                         <InputLabel htmlFor={"class_description"} text={"Class description"}/>
-                           <TextArea 
-                              id="class_description"
-                              name="class_description"
-                              rows="8"
-                              placeholder={"Please enter class description"}
-                              required={true}
-                              value={classDescription}
-                              onChange={(e) => setClassDescription(e.target.value)}
-                            />
-                      </div>
-                  </div>
-                 <PrimaryButton text={"Add class"}/>
-              </form>
-          </div>
-        </section>
+          <form onSubmit={formik.handleSubmit}>
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
 
+              {/* Class Name */}
+              <div className="sm:col-span-2">
+                <InputLabel htmlFor="name" text="Class name" />
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="Please enter class name"
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                {formik.touched.name && formik.errors.name && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formik.errors.name}
+                  </p>
+                )}
+              </div>
+
+              {/* Class Description */}
+              <div className="sm:col-span-2">
+                <InputLabel htmlFor="description" text="Class description" />
+                <TextArea
+                  id="description"
+                  name="description"
+                  rows="8"
+                  placeholder="Please enter class description"
+                  value={formik.values.description}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                {formik.touched.description && formik.errors.description && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formik.errors.description}
+                  </p>
+                )}
+              </div>
+
+            </div>
+
+            <PrimaryButton text={formik.isSubmitting ? "Creating..." : "Create Class"} disabled={formik.isSubmitting} />
+          </form>
+        </div>
+      </section>
     </div>
   )
 }
