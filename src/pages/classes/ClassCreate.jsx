@@ -28,7 +28,12 @@ const ClassCreate = () => {
       try {
         const response = await axios.post(
           'http://localhost:8000/api/student-classes',
-          values
+          values,
+            {
+                                headers: {
+                                    Authorization: "Bearer " + localStorage.getItem("token"),
+                                },
+                            }
         )
 
         toast.success(response.data.message)

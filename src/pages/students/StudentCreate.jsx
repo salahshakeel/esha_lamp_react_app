@@ -12,7 +12,13 @@ const StudentCreate = () => {
 
   const fetchClasses = async () => {
     try{
-      const response = await axios.get('http://localhost:8000/api/student-classes')
+      const response = await axios.get('http://localhost:8000/api/student-classes',
+          {
+                                headers: {
+                                    Authorization: "Bearer " + localStorage.getItem("token"),
+                                },
+                            }
+      )
       setClasses(response.data)
     }
     catch(error){

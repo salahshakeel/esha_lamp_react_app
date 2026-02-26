@@ -18,7 +18,11 @@ const UserCreate = () => {
                 name,
                 email,
                 password
-            });
+            },  {
+                                headers: {
+                                    Authorization: "Bearer " + localStorage.getItem("token"),
+                                },
+                            });
             console.log(response);
             if (response.status === 200) {
                 toast.success("User created successfully!");

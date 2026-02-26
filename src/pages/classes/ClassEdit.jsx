@@ -16,7 +16,14 @@ const ClassEdit = () => {
 
     const fetchClass = async () => {
         try {
-            const response = await axios.get(`http://localhost:8000/api/student-classes/${id}/edit`)
+            const response = await axios.get(`http://localhost:8000/api/student-classes/${id}/edit`,
+                {
+                    headers: {
+                        Authorization: "Bearer " + localStorage.getItem("token"),
+                    },
+                }
+
+            )
             console.log(response.data)
             setUser(response.data)
         } catch (error) {
@@ -31,7 +38,14 @@ const ClassEdit = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.put(`http://localhost:8000/api/student-classes/${id}`, user)
+            const response = await axios.put(`http://localhost:8000/api/student-classes/${id}`, user,
+                {
+                                headers: {
+                                    Authorization: "Bearer " + localStorage.getItem("token"),
+                                },
+                            }
+
+            )
             console.log(response.data)
             toast.success(response.data.message)
         } catch (error) {

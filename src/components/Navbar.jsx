@@ -1,7 +1,28 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-
+import { toast } from 'react-toastify'
+import axios from 'axios'
 export const Navbar = () => {
+
+    const handleLogout = async () => {
+        try{
+            const response = await axios.delete('http://localhost:8000/api/logout',
+                  {
+                                headers: {
+                                    Authorization: "Bearer " + localStorage.getItem("token"),
+                                },
+                            }
+            );
+            if(response.status === 200) {
+                localStorage.removeItem("token");
+                toast.success(response.data.message);
+                window.location.href = "/auth";
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
   return (
     
         <nav class="bg-white fixed w-full z-20 top-0 start-0 border-b border-default">
@@ -28,7 +49,9 @@ export const Navbar = () => {
                   <li>
                 <Link to="/users" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">Users</Link>
                 </li>
-                
+                  <li>
+                <button onClick={handleLogout} class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">Logout</button>
+                </li>
             </ul>
             </div>
         </div>

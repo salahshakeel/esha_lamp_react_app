@@ -7,7 +7,13 @@ const StudentsIndex = () => {
 
     const fetchStudents = async () => {
         try{
-            const response = await axios.get('http://localhost:8000/api/students')
+            const response = await axios.get('http://localhost:8000/api/students',
+                  {
+                                headers: {
+                                    Authorization: "Bearer " + localStorage.getItem("token"),
+                                },
+                            }
+            )
             setStudents(response.data)
             console.log('Fetched students:', response.data) // Debug log
         }
@@ -23,7 +29,13 @@ const StudentsIndex = () => {
     const handleDelete = async (student) => {
         if(window.confirm(`Are you sure you want to delete ${student.name}?`)){
             try{
-                const response = await axios.delete(`http://localhost:8000/api/students/${student.id}`)
+                const response = await axios.delete(`http://localhost:8000/api/students/${student.id}`,
+                      {
+                                headers: {
+                                    Authorization: "Bearer " + localStorage.getItem("token"),
+                                },
+                            }
+                )
                 toast.success(response.data.message)
                 fetchStudents()
             }

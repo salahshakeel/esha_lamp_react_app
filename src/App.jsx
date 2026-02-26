@@ -11,7 +11,10 @@ import UsersIndex from './pages/users/UsersIndex';
 import UserCreate from './pages/users/UserCreate';
 import { ToastContainer } from 'react-toastify';
 import ClassEdit from './pages/classes/ClassEdit';
+import Login from './pages/auth/Login';
+import ProtectedRoute from './components/ProtectedRoute';
 function App() {
+  
   return (
     <div className="App py-16 bg-gray-50 h-screen">
       <BrowserRouter>
@@ -19,13 +22,14 @@ function App() {
         <ToastContainer />
         <Routes>
           <Route path="/" element={<Home/>} />
-            <Route path="/classes" element={<ClassesIndex/>} />
-              <Route path="/classes/create" element={<ClassCreate/>} />
-                <Route path="/classes/:id/edit" element={<ClassEdit/>} />
-              <Route path="/students" element={<StudentsIndex/>} />
-              <Route path="/students/create" element={<StudentCreate/>} />
-              <Route path="/users" element={<UsersIndex/>} />
-              <Route path="/users/create" element={<UserCreate/>} />
+            <Route path="/classes" element={ <ProtectedRoute><ClassesIndex/></ProtectedRoute> } />
+              <Route path="/classes/create" element={ <ProtectedRoute><ClassCreate/></ProtectedRoute> } />
+              <Route path="/classes/:id/edit" element={ <ProtectedRoute><ClassEdit/></ProtectedRoute> } />
+              <Route path="/students" element={ <ProtectedRoute><StudentsIndex/></ProtectedRoute> } />
+              <Route path="/students/create" element={ <ProtectedRoute><StudentCreate/></ProtectedRoute> } />
+              <Route path="/users" element={ <ProtectedRoute><UsersIndex/></ProtectedRoute> } />
+              <Route path="/users/create" element={ <ProtectedRoute><UserCreate/></ProtectedRoute> } />
+              <Route path="/auth" element={<Login/>} />
              <Route path="*" element={<h1>404</h1>} />
         </Routes>
       </BrowserRouter>

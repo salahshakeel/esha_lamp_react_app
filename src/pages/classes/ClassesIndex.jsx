@@ -12,7 +12,12 @@ const ClassesIndex = () => {
    const fetchClasses = async (page = 1, query = "") => {
     try {
         const response = await axios.get(
-            `http://localhost:8000/api/student-classes?page=${page}&search=${query}`
+            `http://localhost:8000/api/student-classes?page=${page}&search=${query}`,
+            {
+                headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token"),
+                },
+            }
         )
 
         setClasses(response.data.data)
@@ -40,7 +45,13 @@ const ClassesIndex = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this class?')) {
             try {
-                const response = await axios.delete(`http://localhost:8000/api/student-classes/${id}`)
+                const response = await axios.delete(`http://localhost:8000/api/student-classes/${id}`,
+                     {
+                        headers: {
+                            Authorization: "Bearer " + localStorage.getItem("token"),
+                        },
+                    }
+                )
                 toast.success(response.data.message)
                fetchClasses(currentPage, search)
             } catch (error) {
